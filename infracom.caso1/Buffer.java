@@ -1,90 +1,53 @@
-import java.util.ArrayList;
+
+import java.util.concurrent.LinkedBlockingQueue;
 
 
-public class Buffer {
 
 
-	//ths piden siempre los mensajes al buffer. el programa se termina cuando ya no tengan mas que pedir
-	// ths responden con el numero aumentado
-	public ArrayList<Mensaje> mensajes;
+public class Buffer 
+{
 
-	public int nClientes;
-	public int nServidores;
+	
+	public LinkedBlockingQueue<Mensaje> mensajes;
 
-	public Buffer()
+	public Buffer(int n)
 	{
-		mensajes = new ArrayList<Mensaje>();
-		nClientes = 0;
-		nServidores = 0;
+		mensajes = new LinkedBlockingQueue<Mensaje>(n);
 	}
 
 
-	//Cliente son redactores, 
-	public synchronized void entrarEnvioCliente()
+	public synchronized void entrarEnvioCliente(Mensaje m) throws InterruptedException
 	{
-		while( nClientes!=0 || nServidores!=0)
+		while(!mensajes.add(m))
 		{
-			try 
-			{
-				wait();
-			} catch (InterruptedException e) {
-				System.out.println("Error esperando, al enviar mensaje");
-			}
-			nClientes++;
+			Thread.yield();
 		}
-	}
-
-
-	public synchronized void envioCliente(Mensaje mes)
-	{
-
-	}
-
-	public synchronized void salirEnvioCliente()
-	{
-		nClientes--;
+		
+		m.wait();
 		notifyAll();
 	}
 
-
-	//Servidor lector
-	public synchronized void entrarRecibirServidor()
+	public synchronized void entrarRecibirServidor() throws InterruptedException
 	{
-		while( nClientes!=0)
+		while (mensajes.isEmpty())
 		{
-			try 
-			{
-				wait();
-			} catch (InterruptedException e) {
-				System.out.println("Error esperando, al recibir mensaje");
-			}
-			nServidores++;
+			aDumir();
 		}
+		mensajes.remove().notify();
+
+		
 	}
 
 
-	public synchronized void recibirServidor()
+	public void aDumir() throws InterruptedException
 	{
-
-	}
-
-	public synchronized void salirRecibirServidor()
-	{
-		nServidores--;
-		if(nServidores == 0)
-			notify();
+		wait();
 	}
 
 
-	/**
-	 * 
-	 */
-	 public static void main()
-	 {
+
+
+
 		 //#consultas por cliente, # clientes,# servidores estan en arcihvo de texto. son parametros
-
-
-
-	 }
 
 }

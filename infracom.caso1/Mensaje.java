@@ -1,9 +1,29 @@
 
-public class Mensaje extends Thread
+public class Mensaje
 {
 
+	private int msn;
+	public Mensaje(int msn)
+	{
+		this.setMsn(msn);
+	}
 	
-	// th cliente crea el msg, lo inicializa y lo envia. envia todos los que necesite
-	//le avisa al buffer que ya acabo
+	public void aDumir() throws InterruptedException
+	{
+		wait();
+	}
+	
+	public void adespertar() throws InterruptedException
+	{
+		notify();
+	}
+
+	public int getMsn() {
+		return msn;
+	}
+
+	public void setMsn(int msn) {
+		this.msn = msn;
+	}
 	
 }

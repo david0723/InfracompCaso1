@@ -1,4 +1,5 @@
 
+
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -7,7 +8,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Buffer 
 {
 
-	
 	public LinkedBlockingQueue<Mensaje> mensajes;
 
 	public Buffer(int n)
@@ -16,14 +16,25 @@ public class Buffer
 	}
 
 
-	public synchronized void entrarEnvioCliente(Mensaje m) 
+	public void entrarEnvioCliente(Mensaje m) 
 	{
-
-		while(!mensajes.add(m))
+		boolean b;
+		synchronized (mensajes) 
 		{
-			System.out.println(Thread.currentThread().getName()+" - Envio mensaje: yield");
-			Thread.yield();
+			System.out.println(Thread.currentThread().getName()+" - Envio mensaje: test");
+			b = mensajes.offer(m);
 		}
+			while(b)
+			{
+				System.out.println(Thread.currentThread().getName()+" - Envio mensaje: yield");
+				Thread.yield();
+				
+				synchronized (mensajes) 
+				{
+					b = mensajes.offer(m);
+				}
+			}
+		
 
 		try 
 		{
@@ -34,23 +45,36 @@ public class Buffer
 			
 		} 
 		catch (InterruptedException e) {e.printStackTrace();}
+		synchronized (this)
+		{
+			notifyAll();
+		}
 		
-		notifyAll();
 	}
 
-	public synchronized void entrarRecibirServidor()
+	public void entrarRecibirServidor()
 	{
-		while (mensajes.isEmpty())
+		Mensaje m;
+		synchronized (mensajes) 
 		{
-			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: espera");
-			try 
+			while (mensajes.isEmpty())
 			{
-				wait();
-			} 
-			catch (InterruptedException e) {e.printStackTrace();}
+				System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: espera");
+				try 
+				{
+					synchronized (this)
+					{
+						wait();
+					}
+					
+				} 
+				catch (InterruptedException e) {e.printStackTrace();}
+			}
+			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: remove");
+			m =mensajes.remove();
+			
 		}
-		System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: remove");
-		Mensaje m =mensajes.remove();
+
 		synchronized (m)
 		{
 			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: going to notify");
@@ -58,7 +82,6 @@ public class Buffer
 			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: notified");
 		}
 		
-		//m.notify();
 
 		
 	}

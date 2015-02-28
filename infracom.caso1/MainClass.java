@@ -9,11 +9,11 @@ public class MainClass
 		
 		ArrayList<Thread> clientes = new ArrayList<Thread>();
 		ArrayList<Thread> servidores = new ArrayList<Thread>();
-		Buffer buffer = new Buffer(5);
+		Buffer buffer = new Buffer(50);
 		
 		for (int i = 0; i!=10;i++)
 		{
-			 clientes.add(new Thread(new Cliente((int) (Math.random()*50), buffer), "Cliente "+i));
+			 clientes.add(new Thread(new Cliente(12, buffer), "Cliente "+i));
 			 servidores.add(new Thread(new Servidor(buffer), "Servidor "+i));
 		}
 		

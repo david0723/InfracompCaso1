@@ -14,7 +14,8 @@ public class Cliente implements Runnable
 		mensajes = new Mensaje[cantidad];
 		for ( int i = 0; i < cantidad; i++)
 		{
-			mensajes[i] = new Mensaje(i);
+//			mensajes[i] = new Mensaje((int) (Math.random()*100));
+			mensajes[i] = new Mensaje((int) i);
 		}
 	}
 

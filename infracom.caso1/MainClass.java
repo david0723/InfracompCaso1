@@ -13,7 +13,7 @@ public class MainClass
 		
 		for (int i = 0; i!=10;i++)
 		{
-			 clientes.add(new Thread(new Cliente(12, buffer), "Cliente "+i));
+			 clientes.add(new Thread(new Cliente(23, buffer), "Cliente "+i));
 			 servidores.add(new Thread(new Servidor(buffer), "Servidor "+i));
 		}
 		

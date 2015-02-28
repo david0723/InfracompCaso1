@@ -21,10 +21,9 @@ public class Buffer
 		boolean b;
 		synchronized (mensajes) 
 		{
-			System.out.println(Thread.currentThread().getName()+" - Envio mensaje: test");
 			b = mensajes.offer(m);
 		}
-			while(b)
+			while(!b)
 			{
 				System.out.println(Thread.currentThread().getName()+" - Envio mensaje: yield");
 				Thread.yield();
@@ -40,7 +39,9 @@ public class Buffer
 		{
 			synchronized (m) 
 			{
+				System.out.println(Thread.currentThread().getName()+" - Sleep");
 				m.wait();
+				System.out.println(Thread.currentThread().getName()+" - Wake up");
 			}
 			
 		} 
@@ -55,25 +56,33 @@ public class Buffer
 	public void entrarRecibirServidor()
 	{
 		Mensaje m;
+		boolean b;
 		synchronized (mensajes) 
 		{
-			while (mensajes.isEmpty())
-			{
-				System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: espera");
-				try 
-				{
-					synchronized (this)
-					{
-						wait();
-					}
-					
-				} 
-				catch (InterruptedException e) {e.printStackTrace();}
-			}
-			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: remove");
-			m =mensajes.remove();
-			
+			b= mensajes.isEmpty();
 		}
+		while (b)
+		{
+			System.out.println(Thread.currentThread().getName()+" - espera");
+			try 
+			{
+				synchronized (this)
+				{
+					System.out.println(Thread.currentThread().getName()+" - Sleep");
+					wait();
+					System.out.println(Thread.currentThread().getName()+" - Wake up");
+				}
+				
+			} 
+			catch (InterruptedException e) {e.printStackTrace();}
+			synchronized (mensajes) 
+			{
+				b= mensajes.isEmpty();
+			}
+		}
+		
+		m =mensajes.remove();
+		System.out.println(Thread.currentThread().getName()+" - remove, msn:" + m.getMsn()+1);
 
 		synchronized (m)
 		{
@@ -87,10 +96,6 @@ public class Buffer
 	}
 
 
-	public void aDumir() throws InterruptedException
-	{
-		wait();
-	}
 
 
 

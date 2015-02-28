@@ -11,11 +11,9 @@ public class Servidor implements Runnable
 	@Override
 	public void run() 
 	{
-		try 
-		{
-			buffer.entrarRecibirServidor();
-		} 
-		catch (InterruptedException e){e.printStackTrace();}
+
+		System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: ");
+		buffer.entrarRecibirServidor();
 	}
 	
 	//varios threads para leer

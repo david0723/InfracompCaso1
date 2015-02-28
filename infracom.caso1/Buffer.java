@@ -16,24 +16,49 @@ public class Buffer
 	}
 
 
-	public synchronized void entrarEnvioCliente(Mensaje m) throws InterruptedException
+	public synchronized void entrarEnvioCliente(Mensaje m) 
 	{
+
 		while(!mensajes.add(m))
 		{
+			System.out.println(Thread.currentThread().getName()+" - Envio mensaje: yield");
 			Thread.yield();
 		}
+
+		try 
+		{
+			synchronized (m) 
+			{
+				m.wait();
+			}
+			
+		} 
+		catch (InterruptedException e) {e.printStackTrace();}
 		
-		m.wait();
 		notifyAll();
 	}
 
-	public synchronized void entrarRecibirServidor() throws InterruptedException
+	public synchronized void entrarRecibirServidor()
 	{
 		while (mensajes.isEmpty())
 		{
-			aDumir();
+			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: espera");
+			try 
+			{
+				wait();
+			} 
+			catch (InterruptedException e) {e.printStackTrace();}
 		}
-		mensajes.remove().notify();
+		System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: remove");
+		Mensaje m =mensajes.remove();
+		synchronized (m)
+		{
+			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: going to notify");
+			m.notify();
+			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: notified");
+		}
+		
+		//m.notify();
 
 		
 	}

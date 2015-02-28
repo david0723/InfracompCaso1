@@ -43,11 +43,10 @@ public class Cliente implements Runnable
 	{
 		for (int i = 0; i<cantidad;i++)
 		{
-			try 
-			{
-				buffer.entrarEnvioCliente(mensajes[i]);
-			} 
-			catch (InterruptedException e) {e.printStackTrace();}
+			System.out.println(Thread.currentThread().getName()+" - Envio mensaje: "+ mensajes[i].getMsn());
+
+			buffer.entrarEnvioCliente(mensajes[i]);
+
 		}
 
 		

@@ -16,24 +16,24 @@ public class Buffer
 	}
 
 
-	public void entrarEnvioCliente(Mensaje m) 
+	public void envioCliente(Mensaje m) 
 	{
 		boolean b;
 		synchronized (mensajes) 
 		{
 			b = mensajes.offer(m);
 		}
-			while(!b)
-			{
-				System.out.println(Thread.currentThread().getName()+" - Envio mensaje: yield");
-				Thread.yield();
-				
-				synchronized (mensajes) 
-				{
-					b = mensajes.offer(m);
-				}
-			}
 		
+		while(!b)
+		{
+			System.out.println(Thread.currentThread().getName()+" - Mensaje no ingresado aun: procesador cedido");
+			Thread.yield();
+
+			synchronized (mensajes) 
+			{
+				b = mensajes.offer(m);
+			}
+		}
 
 		try 
 		{
@@ -46,14 +46,17 @@ public class Buffer
 			
 		} 
 		catch (InterruptedException e) {e.printStackTrace();}
+		
 		synchronized (this)
 		{
 			notifyAll();
+			System.out.println(Thread.currentThread().getName()+" - Mensaje enviado correctamente. Notificando");
+
 		}
 		
 	}
 
-	public void entrarRecibirServidor()
+	public void recibirServidor()
 	{
 		Mensaje m;
 		boolean b;
@@ -63,32 +66,34 @@ public class Buffer
 		}
 		while (b)
 		{
-			System.out.println(Thread.currentThread().getName()+" - espera");
+			System.out.println(Thread.currentThread().getName()+" - La cola esta vacia. Esperando");
 			try 
 			{
 				synchronized (this)
 				{
-					System.out.println(Thread.currentThread().getName()+" - Sleep");
+					//System.out.println(Thread.currentThread().getName()+" - Sleep");
 					wait();
-					System.out.println(Thread.currentThread().getName()+" - Wake up");
+					//System.out.println(Thread.currentThread().getName()+" - Wake up");
 				}
 				
 			} 
 			catch (InterruptedException e) {e.printStackTrace();}
+			
 			synchronized (mensajes) 
 			{
 				b= mensajes.isEmpty();
 			}
 		}
 		
-		m =mensajes.remove();
-		System.out.println(Thread.currentThread().getName()+" - remove, msn:" + m.getMsn()+1);
+		m = mensajes.remove();
+		int resp = m.getMsn()+1;
+		System.out.println(Thread.currentThread().getName()+" - Mensaje respondido: " + resp);
 
 		synchronized (m)
 		{
-			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: going to notify");
+			//System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: going to notify");
 			m.notify();
-			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: notified");
+			System.out.println(Thread.currentThread().getName()+" - Mensaje respondido correctamente. Notificando");
 		}
 		
 
@@ -101,6 +106,5 @@ public class Buffer
 
 
 
-		 //#consultas por cliente, # clientes,# servidores estan en arcihvo de texto. son parametros
 
 }

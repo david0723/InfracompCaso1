@@ -13,8 +13,8 @@ public class Servidor implements Runnable
 	{
 		while(true)
 		{
-			System.out.println(Thread.currentThread().getName()+" - Recepcion mensaje: ");
-			buffer.entrarRecibirServidor();
+			System.out.println(Thread.currentThread().getName()+" - Recibiendo mensaje ");
+			buffer.recibirServidor();
 		}
 	}
 	
